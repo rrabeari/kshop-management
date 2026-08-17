@@ -1,0 +1,770 @@
+<div class="users-page">
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+
+  <div class="users-header">
+
+    <div>
+      <h1>Utilisateurs</h1>
+
+      <p>
+        Gestion des utilisateurs KShop
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="openCreateForm()">
+
+        + Ajouter un utilisateur
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="loading">
+
+        {{ loading ? 'Chargement...' : '↻ Actualiser' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ============================================================
+       LOADING
+       ============================================================ -->
+
+  <div
+    *ngIf="loading"
+    class="loading">
+
+    Chargement des utilisateurs...
+
+  </div>
+
+
+  <!-- ============================================================
+       ERROR
+       ============================================================ -->
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message">
+
+    ⚠ {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ============================================================
+       CREATE FORM
+       ============================================================ -->
+
+  <div
+    *ngIf="showCreateForm"
+    class="user-form-card">
+
+    <div class="form-header">
+
+      <div>
+        <h2>Nouvel utilisateur</h2>
+
+        <p>
+          Créer un nouveau compte utilisateur
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn-close"
+        (click)="closeCreateForm()"
+        [disabled]="saving">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <!-- ERREUR CREATION -->
+
+    <div
+      *ngIf="createErrorMessage"
+      class="form-error">
+
+      ⚠ {{ createErrorMessage }}
+
+    </div>
+
+
+    <div class="user-form">
+
+      <!-- USERNAME -->
+
+      <div class="form-group">
+
+        <label for="username">
+          Nom d'utilisateur *
+        </label>
+
+        <input
+          id="username"
+          type="text"
+          [(ngModel)]="newUser.username"
+          placeholder="ex : caissier01"
+        />
+
+      </div>
+
+
+      <!-- PRENOM -->
+
+      <div class="form-group">
+
+        <label for="firstName">
+          Prénom *
+        </label>
+
+        <input
+          id="firstName"
+          type="text"
+          [(ngModel)]="newUser.firstName"
+          placeholder="Prénom"
+        />
+
+      </div>
+
+
+      <!-- NOM -->
+
+      <div class="form-group">
+
+        <label for="lastName">
+          Nom *
+        </label>
+
+        <input
+          id="lastName"
+          type="text"
+          [(ngModel)]="newUser.lastName"
+          placeholder="Nom"
+        />
+
+      </div>
+
+
+      <!-- EMAIL -->
+
+      <div class="form-group">
+
+        <label for="email">
+          Email *
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="newUser.email"
+          placeholder="exemple@kshop.local"
+        />
+
+      </div>
+
+
+      <!-- PASSWORD -->
+
+      <div class="form-group">
+
+        <label for="password">
+          Mot de passe *
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="newUser.password"
+          placeholder="Mot de passe"
+        />
+
+      </div>
+
+
+      <!-- ROLE -->
+
+      <div class="form-group">
+
+        <label for="createRole">
+          Rôle *
+        </label>
+
+        <select
+          id="createRole"
+          [(ngModel)]="selectedRoleId">
+
+          <option [ngValue]="null">
+            Sélectionner un rôle
+          </option>
+
+          <option [ngValue]="1">
+            Administrateur
+          </option>
+
+          <option [ngValue]="2">
+            Manager
+          </option>
+
+          <option [ngValue]="3">
+            Caissier
+          </option>
+
+          <option [ngValue]="4">
+            Stock
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- ENABLED -->
+
+      <div class="form-group checkbox-group">
+
+        <label>
+
+          <input
+            type="checkbox"
+            [(ngModel)]="newUser.enabled"
+          />
+
+          Compte activé
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="closeCreateForm()"
+        [disabled]="saving">
+
+        Annuler
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="createUser()"
+        [disabled]="saving">
+
+        {{
+          saving
+            ? 'Création...'
+            : 'Créer l’utilisateur'
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ============================================================
+       TABLE + FILTRES
+       ============================================================ -->
+
+  <div
+    *ngIf="!loading && users.length > 0"
+    class="table-container">
+
+
+    <!-- ==========================================================
+         FILTRES
+         ========================================================== -->
+
+    <div class="users-filters">
+
+      <!-- RECHERCHE -->
+
+      <div class="search-box">
+
+        <label for="search">
+          Rechercher
+        </label>
+
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Nom, utilisateur, email..."
+        />
+
+      </div>
+
+
+      <!-- ROLE -->
+
+      <div class="role-filter">
+
+        <label for="roleFilter">
+          Rôle
+        </label>
+
+        <select
+          id="roleFilter"
+          [(ngModel)]="roleFilter"
+          (ngModelChange)="onRoleChange()">
+
+          <option value="ALL">
+            Tous
+          </option>
+
+          <option value="ADMIN">
+            Administrateur
+          </option>
+
+          <option value="MANAGER">
+            Manager
+          </option>
+
+          <option value="CAISSIER">
+            Caissier
+          </option>
+
+          <option value="STOCK">
+            Stock
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- STATUT -->
+
+      <div class="status-filter">
+
+        <label for="statusFilter">
+          Statut
+        </label>
+
+        <select
+          id="statusFilter"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onStatusChange()">
+
+          <option value="ALL">
+            Tous
+          </option>
+
+          <option value="ACTIVE">
+            Actifs
+          </option>
+
+          <option value="INACTIVE">
+            Inactifs
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- RESET -->
+
+      <button
+        type="button"
+        class="btn-clear"
+        (click)="clearFilters()">
+
+        Réinitialiser
+
+      </button>
+
+
+      <!-- COMPTEUR -->
+
+      <div class="results-count">
+
+        {{ filteredUsers.length }}
+        utilisateur(s) trouvé(s)
+
+      </div>
+
+    </div>
+
+
+    <!-- ==========================================================
+         EDIT FORM
+         ========================================================== -->
+
+    <div
+      *ngIf="showEditForm"
+      class="user-form-card">
+
+      <div class="form-header">
+
+        <div>
+
+          <h2>
+            Modifier l'utilisateur
+          </h2>
+
+          <p>
+            Modification du compte #{{ editingUserId }}
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeEditForm()"
+          [disabled]="editSaving">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <!-- ERREUR MODIFICATION -->
+
+      <div
+        *ngIf="editErrorMessage"
+        class="form-error">
+
+        ⚠ {{ editErrorMessage }}
+
+      </div>
+
+
+      <div class="user-form">
+
+        <!-- USERNAME -->
+
+        <div class="form-group">
+
+          <label for="editUsername">
+            Nom d'utilisateur *
+          </label>
+
+          <input
+            id="editUsername"
+            type="text"
+            [(ngModel)]="editUser.username"
+          />
+
+        </div>
+
+
+        <!-- PRENOM -->
+
+        <div class="form-group">
+
+          <label for="editFirstName">
+            Prénom *
+          </label>
+
+          <input
+            id="editFirstName"
+            type="text"
+            [(ngModel)]="editUser.firstName"
+          />
+
+        </div>
+
+
+        <!-- NOM -->
+
+        <div class="form-group">
+
+          <label for="editLastName">
+            Nom *
+          </label>
+
+          <input
+            id="editLastName"
+            type="text"
+            [(ngModel)]="editUser.lastName"
+          />
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+          <label for="editEmail">
+            Email *
+          </label>
+
+          <input
+            id="editEmail"
+            type="email"
+            [(ngModel)]="editUser.email"
+          />
+
+        </div>
+
+
+        <!-- ROLE -->
+
+        <div class="form-group">
+
+          <label for="editRole">
+            Rôle *
+          </label>
+
+          <select
+            id="editRole"
+            [(ngModel)]="editRoleId">
+
+            <option [ngValue]="null">
+              Sélectionner un rôle
+            </option>
+
+            <option [ngValue]="1">
+              Administrateur
+            </option>
+
+            <option [ngValue]="2">
+              Manager
+            </option>
+
+            <option [ngValue]="3">
+              Caissier
+            </option>
+
+            <option [ngValue]="4">
+              Stock
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- ENABLED -->
+
+        <div class="form-group checkbox-group">
+
+          <label>
+
+            <input
+              type="checkbox"
+              [(ngModel)]="editUser.enabled"
+            />
+
+            Compte activé
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeEditForm()"
+          [disabled]="editSaving">
+
+          Annuler
+
+        </button>
+
+
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="updateUser()"
+          [disabled]="editSaving">
+
+          {{
+            editSaving
+              ? 'Enregistrement...'
+              : 'Enregistrer'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==========================================================
+         TABLEAU
+         ========================================================== -->
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>Utilisateur</th>
+
+          <th>Nom</th>
+
+          <th>Email</th>
+
+          <th>Rôle</th>
+
+          <th>Statut</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr
+          *ngFor="let user of filteredUsers">
+
+          <!-- ID -->
+
+          <td>
+            #{{ user.id }}
+          </td>
+
+
+          <!-- USERNAME -->
+
+          <td>
+
+            <strong>
+              {{ user.username }}
+            </strong>
+
+          </td>
+
+
+          <!-- NOM -->
+
+          <td>
+
+            {{ user.firstName }}
+            {{ user.lastName }}
+
+          </td>
+
+
+          <!-- EMAIL -->
+
+          <td>
+
+            {{ user.email }}
+
+          </td>
+
+
+          <!-- ROLE -->
+
+          <td>
+
+            <span class="role">
+
+              {{ user.role || '-' }}
+
+            </span>
+
+          </td>
+
+
+          <!-- STATUS -->
+
+          <td>
+
+            <span
+              class="status"
+              [class.active]="user.enabled"
+              [class.inactive]="!user.enabled">
+
+              {{
+                user.enabled
+                  ? 'Actif'
+                  : 'Inactif'
+              }}
+
+            </span>
+
+          </td>
+
+
+          <!-- ACTIONS -->
+
+          <td class="actions">
+
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="openEditForm(user)">
+
+              Modifier
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- ============================================================
+       EMPTY
+       ============================================================ -->
+
+  <div
+    *ngIf="
+      !loading &&
+      users.length === 0 &&
+      !errorMessage
+    "
+    class="empty">
+
+    Aucun utilisateur trouvé.
+
+  </div>
+
+</div>

@@ -1,0 +1,51 @@
+<div class="access-denied-page">
+
+  <div class="access-denied-card">
+
+    <div class="access-denied-icon">
+      🔒
+    </div>
+
+    <div class="access-denied-code">
+      403
+    </div>
+
+    <h1>
+      Accès refusé
+    </h1>
+
+    <p>
+      Vous n'avez pas les permissions nécessaires
+      pour accéder à cette page.
+    </p>
+
+    <p class="help-text">
+      Si vous pensez qu'il s'agit d'une erreur,
+      contactez votre administrateur.
+    </p>
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="goBack()">
+
+        ← Retour
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="goToDashboard()">
+
+        Tableau de bord
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

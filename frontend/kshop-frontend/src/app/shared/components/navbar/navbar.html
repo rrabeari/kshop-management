@@ -1,0 +1,126 @@
+<nav class="navbar">
+
+  <!-- =========================================================
+       LOGO / NOM APPLICATION
+       ========================================================= -->
+
+  <div class="navbar-brand">
+    KShop
+  </div>
+
+
+  <!-- =========================================================
+       NAVIGATION PRINCIPALE
+       ========================================================= -->
+
+  <div class="navbar-links">
+
+    <!-- DASHBOARD
+         Accessible à tous les utilisateurs connectés -->
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+
+      Dashboard
+
+    </a>
+
+
+    <!-- PRODUITS
+         ADMIN / MANAGER / STOCK -->
+    <a
+      *ngIf="hasRole('ADMIN', 'MANAGER', 'STOCK')"
+      routerLink="/products"
+      routerLinkActive="active">
+
+      Produits
+
+    </a>
+
+
+    <!-- CATEGORIES
+         ADMIN / MANAGER / STOCK -->
+    <a
+      *ngIf="hasRole('ADMIN', 'MANAGER', 'STOCK')"
+      routerLink="/categories"
+      routerLinkActive="active">
+
+      Catégories
+
+    </a>
+
+
+    <!-- SALES
+         ADMIN / MANAGER / CAISSIER -->
+    <a
+      *ngIf="hasRole('ADMIN', 'MANAGER', 'CAISSIER')"
+      routerLink="/sales"
+      routerLinkActive="active">
+
+      Sales
+
+    </a>
+
+
+    <!-- STOCK MOVEMENTS
+         ADMIN / STOCK -->
+    <a
+      *ngIf="hasRole('ADMIN', 'STOCK')"
+      routerLink="/stock"
+      routerLinkActive="active">
+
+      Stock
+
+    </a>
+
+
+    <!-- USERS
+         ADMIN uniquement -->
+    <a
+      *ngIf="hasRole('ADMIN')"
+      routerLink="/users"
+      routerLinkActive="active">
+
+      Utilisateurs
+
+    </a>
+
+  </div>
+
+
+  <!-- =========================================================
+       UTILISATEUR CONNECTÉ
+       ========================================================= -->
+
+  <div class="navbar-user">
+
+    <div class="user-info">
+
+      <!-- Username provenant du login -->
+      <strong>
+        {{ username }}
+      </strong>
+
+      <!-- Role provenant du login -->
+      <span>
+        {{ role }}
+      </span>
+
+    </div>
+
+
+    <!-- DECONNEXION -->
+
+    <button
+      type="button"
+      class="logout-button"
+      (click)="logout()">
+
+      Déconnexion
+
+    </button>
+
+  </div>
+
+</nav>

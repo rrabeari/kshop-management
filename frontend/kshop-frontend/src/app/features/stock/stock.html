@@ -1,0 +1,283 @@
+<div class="sales-page">
+
+  <div class="sales-header">
+    <div>
+      <h1>Gestion de Stock</h1>
+      <p>Suivi des entrées, sorties et ajustements de stock</p>
+    </div>
+    <div class="sales-header-actions">
+      <button *ngIf="!showNewMovement" type="button" class="btn-new-sale" (click)="openNewMovement()">
+        <span>＋</span> Nouveau mouvement
+      </button>
+      <button *ngIf="showNewMovement" type="button" class="btn-cancel-header" (click)="cancelNewMovement()">
+        Annuler
+      </button>
+      <button type="button" class="btn-refresh" (click)="refresh()" [disabled]="loading">
+        <span *ngIf="!loading">↻ Actualiser</span>
+        <span *ngIf="loading">Chargement...</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="movementSuccessMessage" class="sale-success">
+    {{ movementSuccessMessage }}
+  </div>
+
+  <section *ngIf="showNewMovement" class="new-sale-section">
+    <div class="new-sale-header">
+      <div>
+        <h2>Nouveau mouvement de stock</h2>
+        <p>Sélectionnez un produit et configurez l'opération.</p>
+      </div>
+      <span class="sale-badge">Stock</span>
+    </div>
+
+    <div *ngIf="movementFormError" class="sale-form-error">
+      {{ movementFormError }}
+    </div>
+
+    <div class="new-sale-content">
+      <div class="sale-cart">
+        <div class="sale-cart-header">
+          <div>
+            <h3>Configuration</h3>
+            <span>Paramètres de l'opération</span>
+          </div>
+        </div>
+
+        <div class="cart-items" style="display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem;">
+          <div class="detail-item" style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <div>
+              <strong>Produit cible :</strong>
+              <p style="margin: 0.5rem 0 0 0; color: #333;">
+                {{ selectedProduct ? selectedProduct.name + ' (' + selectedProduct.code + ')' : 'Aucun produit sélectionné' }}
+              </p>
+            </div>
+            <span *ngIf="selectedProduct" class="stock-badge">
+              Stock actu : {{ selectedProduct.quantity }} {{ selectedProduct.unit }}
+            </span>
+          </div>
+
+          <div class="discount-control" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label for="movementType">Type de mouvement</label>
+            <select id="movementType" class="form-control" [(ngModel)]="movementRequest.movementType" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;">
+              <option value="ENTREE">ENTRÉE (Réapprovisionnement / Achat)</option>
+              <option value="SORTIE">SORTIE (Perte / Consommation)</option>
+              <option value="AJUSTEMENT">AJUSTEMENT (Correction inventaire)</option>
+            </select>
+          </div>
+
+          <div class="discount-control" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label for="quantity">Quantité</label>
+            <input id="quantity" type="number" min="1" [(ngModel)]="movementRequest.quantity" placeholder="1" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" />
+          </div>
+
+          <div class="discount-control" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label for="reason">Motif / Justification</label>
+            <input id="reason" type="text" [(ngModel)]="movementRequest.reason" placeholder="Ex: Réception fournisseur..." style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px;" />
+          </div>
+        </div>
+
+        <div class="sale-summary">
+          <div class="sale-actions" style="margin-top: 0;">
+            <button type="button" class="btn-cancel-sale" (click)="cancelNewMovement()" [disabled]="movementCreating">Annuler</button>
+            <button type="button" class="btn-confirm-sale" (click)="createMovement()" [disabled]="movementCreating || !selectedProduct">
+              <span *ngIf="!movementCreating">Valider le mouvement</span>
+              <span *ngIf="movementCreating">Enregistrement...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-selection">
+        <div class="product-selection-title">Sélectionner un produit</div>
+        <div class="product-search">
+          <label for="productSearch">Rechercher un produit</label>
+          <input id="productSearch" type="text" [(ngModel)]="productSearchTerm" (ngModelChange)="onProductSearchChange()" placeholder="Nom, code, code-barres..." />
+        </div>
+
+        <div *ngIf="productsLoading" class="loading">Chargement des produits...</div>
+
+        <div *ngIf="!productsLoading && filteredProducts.length > 0" class="product-table-container">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Produit</th>
+                <th>Stock Actuel</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of filteredProducts" [style.background]="selectedProduct?.id === product.id ? '#e7f1ff' : 'transparent'" (click)="selectProductForMovement(product)" style="cursor: pointer;">
+                <td><strong>{{ product.code }}</strong></td>
+                <td>
+                  <strong>{{ product.name }}</strong>
+                  <small>{{ product.category?.name }}</small>
+                </td>
+                <td>
+                  <span class="stock-badge" [class.stock-low]="product.quantity <= product.minimumStock && product.quantity > 0" [class.stock-empty]="product.quantity <= 0">
+                    {{ product.quantity }} {{ product.unit }}
+                  </span>
+                </td>
+                <td>
+                  <button type="button" class="btn-add-product" (click)="$event.stopPropagation(); selectProductForMovement(product)" title="Choisir">✓</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="!productsLoading && filteredProducts.length === 0" class="product-empty">Aucun produit trouvé.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sales-summary">
+    <div class="summary-card total-card">
+      <span class="summary-icon">📦</span>
+      <div>
+        <span class="summary-label">Total mouvements</span>
+        <strong>{{ movements.length }}</strong>
+      </div>
+    </div>
+    <div class="summary-card completed-card">
+      <span class="summary-icon">📥</span>
+      <div>
+        <span class="summary-label">Entrées</span>
+        <strong>{{ entriesCount }}</strong>
+      </div>
+    </div>
+    <div class="summary-card cancelled-card">
+      <span class="summary-icon">📤</span>
+      <div>
+        <span class="summary-label">Sorties</span>
+        <strong>{{ exitsCount }}</strong>
+      </div>
+    </div>
+    <div class="summary-card revenue-card">
+      <span class="summary-icon">⚙️</span>
+      <div>
+        <span class="summary-label">Ajustements</span>
+        <strong>{{ adjustmentsCount }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Chargement des mouvements...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!loading && movements.length > 0" class="sales-filters">
+    <div class="search-box">
+      <label for="search">Rechercher</label>
+      <input id="search" type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="ID, produit, utilisateur, motif..." />
+    </div>
+    <div class="status-filter">
+      <label for="type">Type</label>
+      <select id="type" [(ngModel)]="typeFilter" (ngModelChange)="onTypeChange()">
+        <option value="ALL">Tous les types</option>
+        <option value="ENTREE">Entrées</option>
+        <option value="SORTIE">Sorties</option>
+        <option value="AJUSTEMENT">Ajustements</option>
+      </select>
+    </div>
+    <button type="button" class="btn-clear" (click)="clearFilters()">Réinitialiser</button>
+  </div>
+
+  <div *ngIf="!loading && movements.length > 0" class="results-count">
+    {{ filteredMovements.length }} mouvement(s) trouvé(s)
+  </div>
+
+  <div *ngIf="!loading && filteredMovements.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Produit</th>
+          <th>Type</th>
+          <th>Quantité</th>
+          <th>Motif</th>
+          <th>Utilisateur</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let movement of filteredMovements" (click)="selectMovement(movement)" class="sale-row">
+          <td>#{{ movement.id }}</td>
+          <td>{{ movement.movementDate | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <strong>{{ movement.product?.name }}</strong>
+            <small>{{ movement.product?.code }}</small>
+          </td>
+          <td>
+            <span class="status" [style.background]="movement.movementType === 'ENTREE' ? '#d4edda' : movement.movementType === 'SORTIE' ? '#f8d7da' : '#fff3cd'" [style.color]="movement.movementType === 'ENTREE' ? '#155724' : movement.movementType === 'SORTIE' ? '#721c24' : '#856404'" style="padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 500;">
+              {{ movement.movementType }}
+            </span>
+          </td>
+          <td><strong>{{ movement.quantity }} {{ movement.product?.unit }}</strong></td>
+          <td>{{ movement.reason || '—' }}</td>
+          <td>
+            <strong>{{ movement.user?.firstName }} {{ movement.user?.lastName }}</strong>
+            <small>{{ movement.user?.username }}</small>
+          </td>
+          <td>
+            <button type="button" class="btn-cancel-history" (click)="deleteMovement(movement, $event)" title="Supprimer">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!loading && filteredMovements.length === 0 && !errorMessage" class="empty">
+    <div>
+      <strong>Aucun mouvement de stock trouvé</strong>
+      <p>Modifiez vos critères de recherche ou enregistrez un nouveau mouvement.</p>
+    </div>
+  </div>
+
+  <div *ngIf="selectedMovement" class="sale-detail-overlay" (click)="closeMovementDetail()">
+    <div class="sale-detail" (click)="$event.stopPropagation()">
+      <div class="sale-detail-header">
+        <div>
+          <h2>Mouvement #{{ selectedMovement.id }}</h2>
+          <span>{{ selectedMovement.movementDate | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <button type="button" class="btn-close-detail" (click)="closeMovementDetail()">×</button>
+      </div>
+      <div class="sale-detail-body" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="detail-item">
+          <div>
+            <strong>Produit :</strong>
+            <span>{{ selectedMovement.product?.name }} ({{ selectedMovement.product?.code }})</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div>
+            <strong>Type de mouvement :</strong>
+            <span>{{ selectedMovement.movementType }}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div>
+            <strong>Quantité :</strong>
+            <span>{{ selectedMovement.quantity }} {{ selectedMovement.product?.unit }}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div>
+            <strong>Motif :</strong>
+            <span>{{ selectedMovement.reason || 'Aucun motif renseigné' }}</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div>
+            <strong>Opérateur :</strong>
+            <span>{{ selectedMovement.user?.firstName }} {{ selectedMovement.user?.lastName }} ({{ selectedMovement.user?.username }})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

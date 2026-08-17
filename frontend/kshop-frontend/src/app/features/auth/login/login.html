@@ -1,0 +1,106 @@
+<div class="login-page">
+
+  <div class="login-card">
+
+    <div class="login-header">
+
+      <div class="logo">
+        K
+      </div>
+
+      <h1>KShop</h1>
+
+      <p>
+        Gestion de magasin
+      </p>
+
+    </div>
+
+    <form
+      (ngSubmit)="onSubmit()"
+      #loginForm="ngForm"
+    >
+
+      <!-- Username -->
+
+      <div class="form-group">
+
+        <label for="username">
+          Nom d'utilisateur
+        </label>
+
+        <input
+          id="username"
+          name="username"
+          type="text"
+          [(ngModel)]="username"
+          placeholder="Entrez votre nom d'utilisateur"
+          autocomplete="username"
+          required
+        >
+
+      </div>
+
+
+      <!-- Password -->
+
+      <div class="form-group">
+
+        <label for="password">
+          Mot de passe
+        </label>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          placeholder="Entrez votre mot de passe"
+          autocomplete="current-password"
+          required
+        >
+
+      </div>
+
+
+      <!-- Error -->
+
+      @if (errorMessage) {
+
+        <div class="error-message">
+
+          {{ errorMessage }}
+
+        </div>
+
+      }
+
+
+      <!-- Button -->
+
+      <button
+        type="submit"
+        [disabled]="loading || loginForm.invalid"
+      >
+
+        @if (loading) {
+
+          <span>
+            Connexion...
+          </span>
+
+        } @else {
+
+          <span>
+            Se connecter
+          </span>
+
+        }
+
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

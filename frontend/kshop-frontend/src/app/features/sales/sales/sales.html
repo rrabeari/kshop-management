@@ -1,0 +1,1009 @@
+<div class="sales-page">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <div class="sales-header">
+
+    <div>
+      <h1>Ventes</h1>
+
+      <p>
+        Gestion et suivi des ventes
+      </p>
+    </div>
+
+    <div class="sales-header-actions">
+
+      <button
+        *ngIf="!showNewSale"
+        type="button"
+        class="btn-new-sale"
+        (click)="openNewSale()">
+
+        <span>＋</span>
+
+        Nouvelle vente
+
+      </button>
+
+      <button
+        *ngIf="showNewSale"
+        type="button"
+        class="btn-cancel-header"
+        (click)="cancelNewSale()">
+
+        Annuler
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="loading">
+
+        <span *ngIf="!loading">
+          ↻ Actualiser
+        </span>
+
+        <span *ngIf="loading">
+          Chargement...
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MESSAGE SUCCÈS
+       ===================================================== -->
+
+  <div
+    *ngIf="saleSuccessMessage"
+    class="sale-success">
+
+    {{ saleSuccessMessage }}
+
+  </div>
+
+
+  <!-- =====================================================
+       NOUVELLE VENTE
+       ===================================================== -->
+
+  <section
+    *ngIf="showNewSale"
+    class="new-sale-section">
+
+    <!-- HEADER -->
+
+    <div class="new-sale-header">
+
+      <div>
+
+        <h2>
+          Nouvelle vente
+        </h2>
+
+        <p>
+          Sélectionnez les produits et composez la vente.
+        </p>
+
+      </div>
+
+      <span class="sale-badge">
+        Caisse
+      </span>
+
+    </div>
+
+
+    <!-- ERREUR CAISSE -->
+
+    <div
+      *ngIf="saleFormError"
+      class="sale-form-error">
+
+      {{ saleFormError }}
+
+    </div>
+
+
+    <!-- CONTENU -->
+
+    <div class="new-sale-content">
+
+
+      <!-- =================================================
+           PANIER
+           ================================================= -->
+
+      <div class="sale-cart">
+
+        <div class="sale-cart-header">
+
+          <div>
+
+            <h3>
+              Panier
+            </h3>
+
+            <span>
+              {{ cartItems.length }}
+              article(s)
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- PANIER VIDE -->
+
+        <div
+          *ngIf="cartItems.length === 0"
+          class="cart-empty">
+
+          <div>
+
+            <strong>
+              Panier vide
+            </strong>
+
+            <p>
+              Ajoutez des produits depuis la liste.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- ARTICLES -->
+
+        <div
+          *ngIf="cartItems.length > 0"
+          class="cart-items">
+
+          <div
+            *ngFor="let item of cartItems"
+            class="cart-item">
+
+            <div class="cart-item-info">
+
+              <strong>
+                {{ item.product.name }}
+              </strong>
+
+              <span>
+                {{ item.product.sellingPrice | number:'1.2-2' }}
+                Ar / {{ item.product.unit }}
+              </span>
+
+            </div>
+
+
+            <!-- QUANTITÉ -->
+
+            <div class="quantity-control">
+
+              <button
+                type="button"
+                (click)="decreaseQuantity(item)">
+
+                −
+
+              </button>
+
+              <span>
+                {{ item.quantity }}
+              </span>
+
+              <button
+                type="button"
+                (click)="increaseQuantity(item)">
+
+                +
+
+              </button>
+
+            </div>
+
+
+            <!-- SOUS-TOTAL -->
+
+            <strong class="cart-item-subtotal">
+
+              {{ getItemSubtotal(item) | number:'1.2-2' }}
+              Ar
+
+            </strong>
+
+
+            <!-- SUPPRIMER -->
+
+            <button
+              type="button"
+              class="btn-remove-item"
+              title="Supprimer"
+              (click)="removeFromCart(item)">
+
+              ×
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- RÉSUMÉ -->
+
+        <div class="sale-summary">
+
+          <div class="sale-summary-row">
+
+            <span>
+              Sous-total
+            </span>
+
+            <strong>
+              {{ subtotal | number:'1.2-2' }} Ar
+            </strong>
+
+          </div>
+
+
+          <!-- REMISE -->
+
+          <div class="discount-control">
+
+            <label for="discount">
+              Remise
+            </label>
+
+            <input
+              id="discount"
+              type="number"
+              min="0"
+              [(ngModel)]="discount"
+              placeholder="0"
+            />
+
+          </div>
+
+
+          <div class="sale-summary-row">
+
+            <span>
+              Remise appliquée
+            </span>
+
+            <strong>
+              {{ validDiscount | number:'1.2-2' }} Ar
+            </strong>
+
+          </div>
+
+
+          <!-- TOTAL -->
+
+          <div class="sale-total">
+
+            <span>
+              TOTAL
+            </span>
+
+            <strong>
+              {{ total | number:'1.2-2' }} Ar
+            </strong>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="sale-actions">
+
+            <button
+              type="button"
+              class="btn-cancel-sale"
+              (click)="cancelNewSale()"
+              [disabled]="saleCreating">
+
+              Annuler
+
+            </button>
+
+            <button
+              type="button"
+              class="btn-confirm-sale"
+              (click)="createSale()"
+              [disabled]="
+                saleCreating ||
+                cartItems.length === 0
+              ">
+
+              <span *ngIf="!saleCreating">
+                Valider la vente
+              </span>
+
+              <span *ngIf="saleCreating">
+                Enregistrement...
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           PRODUITS
+           ================================================= -->
+
+      <div class="product-selection">
+
+        <div class="product-selection-title">
+          Produits disponibles
+        </div>
+
+
+        <!-- RECHERCHE -->
+
+        <div class="product-search">
+
+          <label for="productSearch">
+            Rechercher un produit
+          </label>
+
+          <input
+            id="productSearch"
+            type="text"
+            [(ngModel)]="productSearchTerm"
+            (ngModelChange)="onProductSearchChange()"
+            placeholder="Nom, code, code-barres..."
+          />
+
+        </div>
+
+
+        <!-- LOADING PRODUITS -->
+
+        <div
+          *ngIf="productsLoading"
+          class="loading">
+
+          Chargement des produits...
+
+        </div>
+
+
+        <!-- TABLE PRODUITS -->
+
+        <div
+          *ngIf="
+            !productsLoading &&
+            filteredProducts.length > 0
+          "
+          class="product-table-container">
+
+          <table class="product-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Code
+                </th>
+
+                <th>
+                  Produit
+                </th>
+
+                <th>
+                  Catégorie
+                </th>
+
+                <th>
+                  Prix
+                </th>
+
+                <th>
+                  Stock
+                </th>
+
+                <th>
+                  Action
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="
+                  let product of filteredProducts
+                ">
+
+                <td>
+
+                  <strong>
+                    {{ product.code }}
+                  </strong>
+
+                </td>
+
+                <td>
+
+                  <strong>
+                    {{ product.name }}
+                  </strong>
+
+                  <small>
+                    {{ product.barcode }}
+                  </small>
+
+                </td>
+
+                <td>
+
+                  <span class="product-category">
+
+                    {{ product.category?.name || '—' }}
+
+                  </span>
+
+                </td>
+
+                <td class="product-price-cell">
+
+                  {{ product.sellingPrice | number:'1.2-2' }}
+                  Ar
+
+                </td>
+
+                <td>
+
+                  <span
+                    class="stock-badge"
+                    [class.stock-low]="
+                      product.quantity <=
+                      product.minimumStock &&
+                      product.quantity > 0
+                    "
+                    [class.stock-empty]="
+                      product.quantity <= 0
+                    ">
+
+                    {{ product.quantity }}
+                    {{ product.unit }}
+
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="btn-add-product"
+                    (click)="addToCart(product)"
+                    [disabled]="
+                      product.quantity <= 0
+                    "
+                    title="Ajouter au panier">
+
+                    ＋
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- AUCUN PRODUIT -->
+
+        <div
+          *ngIf="
+            !productsLoading &&
+            filteredProducts.length === 0
+          "
+          class="product-empty">
+
+          Aucun produit disponible.
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       STATISTIQUES
+       ===================================================== -->
+
+  <div class="sales-summary">
+
+    <div class="summary-card total-card">
+
+      <span class="summary-icon">
+        🧾
+      </span>
+
+      <div>
+
+        <span class="summary-label">
+          Total ventes
+        </span>
+
+        <strong>
+          {{ sales.length }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card completed-card">
+
+      <span class="summary-icon">
+        ✓
+      </span>
+
+      <div>
+
+        <span class="summary-label">
+          Ventes terminées
+        </span>
+
+        <strong>
+          {{ completedSalesCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card cancelled-card">
+
+      <span class="summary-icon">
+        ×
+      </span>
+
+      <div>
+
+        <span class="summary-label">
+          Ventes annulées
+        </span>
+
+        <strong>
+          {{ cancelledSalesCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card revenue-card">
+
+      <span class="summary-icon">
+        Ar
+      </span>
+
+      <div>
+
+        <span class="summary-label">
+          Chiffre d'affaires
+        </span>
+
+        <strong>
+          {{ completedSalesTotal | number:'1.2-2' }} Ar
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       LOADING HISTORIQUE
+       ===================================================== -->
+
+  <div
+    *ngIf="loading"
+    class="loading">
+
+    Chargement des ventes...
+
+  </div>
+
+
+  <!-- =====================================================
+       ERROR HISTORIQUE
+       ===================================================== -->
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- =====================================================
+       FILTRES
+       ===================================================== -->
+
+  <div
+    *ngIf="
+      !loading &&
+      sales.length > 0
+    "
+    class="sales-filters">
+
+    <div class="search-box">
+
+      <label for="search">
+        Rechercher
+      </label>
+
+      <input
+        id="search"
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="ID, utilisateur, produit..."
+      />
+
+    </div>
+
+
+    <div class="status-filter">
+
+      <label for="status">
+        Statut
+      </label>
+
+      <select
+        id="status"
+        [(ngModel)]="statusFilter"
+        (ngModelChange)="onStatusChange()">
+
+        <option value="ALL">
+          Tous
+        </option>
+
+        <option value="COMPLETED">
+          Terminées
+        </option>
+
+        <option value="CANCELLED">
+          Annulées
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="btn-clear"
+      (click)="clearFilters()">
+
+      Réinitialiser
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       NOMBRE RÉSULTATS
+       ===================================================== -->
+
+  <div
+    *ngIf="
+      !loading &&
+      sales.length > 0
+    "
+    class="results-count">
+
+    {{ filteredSales.length }}
+    vente(s) trouvée(s)
+
+  </div>
+
+
+  <!-- =====================================================
+       HISTORIQUE
+       ===================================================== -->
+
+  <div
+    *ngIf="
+      !loading &&
+      filteredSales.length > 0
+    "
+    class="table-container">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>Date</th>
+
+          <th>Utilisateur</th>
+
+          <th>Articles</th>
+
+          <th>Remise</th>
+
+          <th>Total</th>
+
+          <th>Statut</th>
+
+          <th>Action</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr
+          *ngFor="
+            let sale of filteredSales
+          "
+          (click)="selectSale(sale)"
+          class="sale-row">
+
+          <td>
+            #{{ sale.id }}
+          </td>
+
+          <td>
+            {{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+
+          <td>
+
+            <strong>
+              {{ sale.firstName }}
+              {{ sale.lastName }}
+            </strong>
+
+            <small>
+              {{ sale.username }}
+            </small>
+
+          </td>
+
+          <td>
+
+            <div
+              *ngFor="
+                let item of sale.items
+              "
+              class="sale-item">
+
+              <strong>
+                {{ item.productName }}
+              </strong>
+
+              <span>
+
+                {{ item.quantity }}
+                ×
+                {{ item.unitPrice | number:'1.2-2' }} Ar
+
+              </span>
+
+            </div>
+
+          </td>
+
+          <td>
+
+            {{ sale.discount | number:'1.2-2' }} Ar
+
+          </td>
+
+          <td class="total">
+
+            {{ sale.totalAmount | number:'1.2-2' }} Ar
+
+          </td>
+
+          <td>
+
+            <span
+              class="status"
+              [class.completed]="
+                sale.status === 'COMPLETED'
+              "
+              [class.cancelled]="
+                sale.status === 'CANCELLED'
+              ">
+
+              {{ sale.status }}
+
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              *ngIf="
+                sale.status === 'COMPLETED'
+              "
+              type="button"
+              class="btn-cancel-history"
+              (click)="
+                $event.stopPropagation();
+                cancelSale(sale)
+              ">
+
+              Annuler
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- =====================================================
+       AUCUNE VENTE
+       ===================================================== -->
+
+  <div
+    *ngIf="
+      !loading &&
+      filteredSales.length === 0 &&
+      !errorMessage
+    "
+    class="empty">
+
+    <div>
+
+      <strong>
+        Aucune vente trouvée
+      </strong>
+
+      <p>
+        Essayez de modifier vos critères de recherche.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       DÉTAIL VENTE
+       ===================================================== -->
+
+  <div
+    *ngIf="selectedSale"
+    class="sale-detail-overlay"
+    (click)="closeSaleDetail()">
+
+    <div
+      class="sale-detail"
+      (click)="$event.stopPropagation()">
+
+      <div class="sale-detail-header">
+
+        <div>
+
+          <h2>
+            Vente #{{ selectedSale.id }}
+          </h2>
+
+          <span>
+            {{ selectedSale.saleDate | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn-close-detail"
+          (click)="closeSaleDetail()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <div class="sale-detail-body">
+
+        <div
+          *ngFor="
+            let item of selectedSale.items
+          "
+          class="detail-item">
+
+          <div>
+
+            <strong>
+              {{ item.productName }}
+            </strong>
+
+            <span>
+              {{ item.quantity }}
+              ×
+              {{ item.unitPrice | number:'1.2-2' }} Ar
+            </span>
+
+          </div>
+
+          <strong>
+
+            {{ item.subtotal | number:'1.2-2' }} Ar
+
+          </strong>
+
+        </div>
+
+
+        <div class="detail-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            {{ selectedSale.totalAmount | number:'1.2-2' }} Ar
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

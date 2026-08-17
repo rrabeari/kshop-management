@@ -1,0 +1,170 @@
+.access-denied-page {
+  min-height: calc(100vh - 70px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  background: #f5f7fa;
+}
+
+
+.access-denied-card {
+  width: 100%;
+  max-width: 520px;
+
+  padding: 45px 35px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+.access-denied-icon {
+  width: 80px;
+  height: 80px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 36px;
+
+  background: #fff3cd;
+
+  border-radius: 50%;
+}
+
+
+.access-denied-code {
+  margin-bottom: 5px;
+
+  font-size: 48px;
+  font-weight: 700;
+
+  color: #dc3545;
+}
+
+
+.access-denied-card h1 {
+  margin: 0 0 15px;
+
+  font-size: 28px;
+
+  color: #212529;
+}
+
+
+.access-denied-card p {
+  margin: 0 auto;
+
+  max-width: 420px;
+
+  font-size: 16px;
+  line-height: 1.6;
+
+  color: #6c757d;
+}
+
+
+.access-denied-card .help-text {
+  margin-top: 10px;
+
+  font-size: 14px;
+}
+
+
+.actions {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+
+.actions button {
+  min-width: 150px;
+
+  padding: 11px 20px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+
+.actions button:hover {
+  transform: translateY(-1px);
+}
+
+
+.btn-primary {
+  color: #ffffff;
+
+  background: #0d6efd;
+}
+
+
+.btn-secondary {
+  color: #495057;
+
+  background: #e9ecef;
+}
+
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.9;
+}
+
+
+@media (max-width: 576px) {
+
+  .access-denied-card {
+    padding: 35px 20px;
+  }
+
+
+  .access-denied-code {
+    font-size: 42px;
+  }
+
+
+  .access-denied-card h1 {
+    font-size: 24px;
+  }
+
+
+  .actions {
+    flex-direction: column;
+  }
+
+
+  .actions button {
+    width: 100%;
+  }
+
+}

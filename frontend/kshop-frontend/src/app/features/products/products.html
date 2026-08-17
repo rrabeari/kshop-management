@@ -1,0 +1,487 @@
+<div class="products-page">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <div class="products-header">
+
+    <div>
+
+      <h1>
+        Produits
+      </h1>
+
+      <p>
+        Gestion du catalogue et du stock
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="btn-refresh"
+      (click)="refresh()"
+      [disabled]="loading">
+
+      <span *ngIf="!loading">
+        ↻ Actualiser
+      </span>
+
+      <span *ngIf="loading">
+        Chargement...
+      </span>
+
+    </button>
+
+  </div>
+
+  <!-- =====================================================
+     STATISTIQUES
+     ===================================================== -->
+
+<div class="products-summary">
+
+  <!-- TOTAL -->
+
+  <div class="summary-card">
+
+    <span class="summary-icon">
+      📦
+    </span>
+
+    <div>
+
+      <span class="summary-label">
+        Total produits
+      </span>
+
+      <strong>
+        {{ totalProducts }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACTIFS -->
+
+  <div class="summary-card">
+
+    <span class="summary-icon">
+      ✓
+    </span>
+
+    <div>
+
+      <span class="summary-label">
+        Produits actifs
+      </span>
+
+      <strong>
+        {{ activeProductsCount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- STOCK FAIBLE -->
+
+  <div class="summary-card">
+
+    <span class="summary-icon">
+      ⚠
+    </span>
+
+    <div>
+
+      <span class="summary-label">
+        Stock faible
+      </span>
+
+      <strong>
+        {{ lowStockProductsCount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- INACTIFS -->
+
+  <div class="summary-card">
+
+    <span class="summary-icon">
+      ×
+    </span>
+
+    <div>
+
+      <span class="summary-label">
+        Produits inactifs
+      </span>
+
+      <strong>
+        {{ inactiveProductsCount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+  <!-- =====================================================
+       LOADING
+       ===================================================== -->
+
+  <div
+    *ngIf="loading"
+    class="loading">
+
+    <div class="loading-spinner"></div>
+
+    <span>
+      Chargement des produits...
+    </span>
+
+  </div>
+
+
+  <!-- =====================================================
+       ERROR
+       ===================================================== -->
+
+  <div
+    *ngIf="errorMessage && !loading"
+    class="error-message">
+
+    <div class="error-icon">
+      ⚠
+    </div>
+
+    <div>
+      <strong>
+        Impossible de charger les produits
+      </strong>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+    </div>
+
+  </div>
+
+  <!-- =====================================================
+     FILTRES
+     ===================================================== -->
+
+<div class="products-filters">
+
+  <!-- RECHERCHE -->
+
+  <div class="search-box">
+
+    <label for="product-search">
+      Rechercher
+    </label>
+
+    <input
+      id="product-search"
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Code, nom, code-barres, catégorie..."
+    />
+
+  </div>
+
+
+  <!-- STATUT -->
+
+  <div class="status-filter">
+
+    <label for="product-status">
+      Statut
+    </label>
+
+    <select
+      id="product-status"
+      [(ngModel)]="statusFilter"
+      (ngModelChange)="onStatusChange()">
+
+      <option value="ALL">
+        Tous
+      </option>
+
+      <option value="ACTIVE">
+        Actifs
+      </option>
+
+      <option value="INACTIVE">
+        Inactifs
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- RESET -->
+
+  <button
+    type="button"
+    class="btn-clear"
+    (click)="clearFilters()">
+
+    Réinitialiser
+
+  </button>
+
+</div>
+
+
+<!-- NOMBRE DE RÉSULTATS -->
+
+<div class="results-count">
+
+  {{ filteredProducts.length }}
+  produit(s) trouvé(s)
+
+</div>
+
+
+  <!-- =====================================================
+     TABLE PRODUITS
+     ===================================================== -->
+
+<div
+  *ngIf="
+    !loading &&
+    filteredProducts.length > 0
+  "
+  class="table-container">
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>ID</th>
+
+        <th>Produit</th>
+
+        <th>Catégorie</th>
+
+        <th>Prix achat</th>
+
+        <th>Prix vente</th>
+
+        <th>Stock</th>
+
+        <th>Unité</th>
+
+        <th>Statut</th>
+
+      </tr>
+
+    </thead>
+
+
+    <tbody>
+
+      <tr
+        *ngFor="let product of filteredProducts">
+
+        <!-- ID -->
+
+        <td class="product-id">
+
+          #{{ product.id }}
+
+        </td>
+
+
+        <!-- PRODUIT -->
+
+        <td class="product-info">
+
+          <strong>
+            {{ product.name }}
+          </strong>
+
+          <span>
+            {{ product.code }}
+          </span>
+
+          <small>
+            {{ product.barcode }}
+          </small>
+
+        </td>
+
+
+        <!-- CATÉGORIE -->
+
+        <td>
+
+          <span class="category-badge">
+
+            {{ product.category?.name || 'Sans catégorie' }}
+
+          </span>
+
+        </td>
+
+
+        <!-- PRIX ACHAT -->
+
+        <td class="price">
+
+          {{ product.purchasePrice | number:'1.2-2' }}
+
+          <span>
+            Ar
+          </span>
+
+        </td>
+
+
+        <!-- PRIX VENTE -->
+
+        <td class="selling-price">
+
+          {{ product.sellingPrice | number:'1.2-2' }}
+
+          <span>
+            Ar
+          </span>
+
+        </td>
+
+
+        <!-- STOCK -->
+
+        <td>
+
+          <div class="stock-info">
+
+            <strong>
+              {{ product.quantity }}
+            </strong>
+
+            <small>
+              minimum :
+              {{ product.minimumStock }}
+            </small>
+
+
+            <!-- RUPTURE -->
+
+            <span
+              *ngIf="isOutOfStock(product)"
+              class="stock-badge out-of-stock">
+
+              🔴 Rupture
+
+            </span>
+
+
+            <!-- STOCK FAIBLE -->
+
+            <span
+              *ngIf="
+                !isOutOfStock(product) &&
+                isLowStock(product)
+              "
+              class="stock-badge low-stock">
+
+              ⚠ Stock faible
+
+            </span>
+
+          </div>
+
+        </td>
+
+
+        <!-- UNITÉ -->
+
+        <td>
+
+          <span class="unit-badge">
+
+            {{ product.unit }}
+
+          </span>
+
+        </td>
+
+
+        <!-- STATUT -->
+
+        <td>
+
+          <span
+            class="status"
+            [class.active]="product.active"
+            [class.inactive]="!product.active">
+
+            {{ product.active ? 'ACTIF' : 'INACTIF' }}
+
+          </span>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+
+  <!-- =====================================================
+       EMPTY
+       ===================================================== -->
+
+  <div
+    *ngIf="
+      !loading &&
+      !errorMessage &&
+      filteredProducts.length === 0
+    "
+    class="empty">
+
+    <div class="empty-icon">
+      📦
+    </div>
+
+    <strong>
+      Aucun produit trouvé
+    </strong>
+
+    <p>
+      Aucun produit ne correspond à votre recherche ou à vos filtres.
+    </p>
+
+    <button
+      type="button"
+      class="btn-clear"
+      (click)="clearFilters()">
+
+      Réinitialiser les filtres
+
+    </button>
+
+  </div>
+
+</div>
