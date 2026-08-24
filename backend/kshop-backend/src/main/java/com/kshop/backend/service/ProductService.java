@@ -4,77 +4,74 @@
  */
 package com.kshop.backend.service;
 
+import com.kshop.backend.dto.request.ProductRequestDTO;
+import com.kshop.backend.dto.response.ProductResponseDTO;
+import com.kshop.backend.entity.Category;
 import com.kshop.backend.entity.Product;
+import com.kshop.backend.mapper.ProductMapper;
+import com.kshop.backend.repository.CategoryRepository;
 import com.kshop.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Iris-PC
  */
 
-
 /**
  * Service métier pour la gestion des produits.
- *
- * Le Service se situe entre le Controller et le Repository :
- *
- * Controller
- *     ↓
- * ProductService
- *     ↓
- * ProductRepository
- *     ↓
- * PostgreSQL
- *
- * Le Controller ne communique donc pas directement
- * avec la base de données.
+ * 
+ * Il fait l'intermédiaire entre le Controller et le Repository, 
+ * et utilise le ProductMapper statique pour transformer les entités en DTOs.
  */
 @Service
 @Transactional
 public class ProductService {
-    /*
-     * Repository utilisé pour accéder à la table product.
-     *
-     * Spring injecte automatiquement cette dépendance
-     * grâce à l'annotation @Service et au constructeur.
-     */
+
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     /**
-     * Injection du ProductRepository.
-     *
-     * L'injection par constructeur est recommandée
-     * car elle rend la dépendance obligatoire.
+     * Injection du ProductRepository et du CategoryRepository.
      */
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
-     * Récupère tous les produits.
+     * Récupère tous les produits sous forme de DTO.
      *
-     * @return liste de tous les produits
+     * @return liste de tous les produits (DTO)
      */
     @Transactional(readOnly = true)
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<ProductResponseDTO> findAll() {
+        return productRepository.findAll().stream()
+                .map(ProductMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Recherche un produit par son ID.
-     *
-     * Si le produit n'existe pas, une exception est levée.
+     * Recherche un produit par son ID et retourne son DTO.
      *
      * @param id identifiant du produit
-     * @return produit trouvé
+     * @return produit trouvé (DTO)
      */
     @Transactional(readOnly = true)
-    public Product findById(Long id) {
+    public ProductResponseDTO findByIdDTO(Long id) {
+        Product product = findEntityById(id);
+        return ProductMapper.toResponseDTO(product);
+    }
 
+    /**
+     * Méthode interne utilitaire pour récupérer l'entité brute si besoin dans le service.
+     */
+    @Transactional(readOnly = true)
+    public Product findEntityById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException(
@@ -86,369 +83,218 @@ public class ProductService {
     /**
      * Recherche un produit par son code.
      *
-     * Exemple :
-     *
-     * PRD001
-     *
      * @param code code du produit
-     * @return produit trouvé
+     * @return produit trouvé (DTO)
      */
     @Transactional(readOnly = true)
-    public Product findByCode(String code) {
-
-        return productRepository.findByCode(code)
+    public ProductResponseDTO findByCode(String code) {
+        Product product = productRepository.findByCode(code)
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Produit introuvable avec le code : " + code
                         )
                 );
+        return ProductMapper.toResponseDTO(product);
     }
 
     /**
      * Recherche un produit par son code-barres.
      *
-     * Exemple :
-     *
-     * 6001234567890
-     *
      * @param barcode code-barres
-     * @return produit trouvé
+     * @return produit trouvé (DTO)
      */
     @Transactional(readOnly = true)
-    public Product findByBarcode(String barcode) {
-
-        return productRepository.findByBarcode(barcode)
+    public ProductResponseDTO findByBarcode(String barcode) {
+        Product product = productRepository.findByBarcode(barcode)
                 .orElseThrow(() ->
                         new RuntimeException(
-                                "Produit introuvable avec le code-barres : "
-                                        + barcode
+                                "Produit introuvable avec le code-barres : " + barcode
                         )
                 );
+        return ProductMapper.toResponseDTO(product);
     }
 
     /**
      * Récupère tous les produits d'une catégorie.
      *
      * @param categoryId ID de la catégorie
-     * @return liste des produits de la catégorie
+     * @return liste des produits de la catégorie (DTO)
      */
     @Transactional(readOnly = true)
-    public List<Product> findByCategory(Long categoryId) {
-
-        return productRepository.findByCategoryId(categoryId);
+    public List<ProductResponseDTO> findByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId).stream()
+                .map(ProductMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     /**
      * Récupère uniquement les produits actifs.
      *
-     * active = true
-     *
-     * @return liste des produits actifs
+     * @return liste des produits actifs (DTO)
      */
     @Transactional(readOnly = true)
-    public List<Product> findActiveProducts() {
-
-        return productRepository.findByActiveTrue();
+    public List<ProductResponseDTO> findActiveProducts() {
+        return productRepository.findByActiveTrue().stream()
+                .map(ProductMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     /**
      * Récupère les produits actifs d'une catégorie.
      *
      * @param categoryId ID de la catégorie
-     * @return produits actifs de la catégorie
+     * @return produits actifs de la catégorie (DTO)
      */
     @Transactional(readOnly = true)
-    public List<Product> findActiveProductsByCategory(Long categoryId) {
-
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId);
+    public List<ProductResponseDTO> findActiveProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryIdAndActiveTrue(categoryId).stream()
+                .map(ProductMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Crée un nouveau produit.
+     * Crée un nouveau produit à partir d'un ProductRequestDTO.
      *
-     * Avant l'enregistrement, nous vérifions :
-     *
-     * 1. Le code n'existe pas déjà.
-     * 2. Le code-barres n'existe pas déjà s'il est renseigné.
-     *
-     * @param product produit à créer
-     * @return produit enregistré
+     * @param requestDTO données du produit à créer
+     * @return produit enregistré (DTO)
      */
-    public Product create(Product product) {
+    public ProductResponseDTO create(ProductRequestDTO requestDTO) {
 
-        /*
-         * Vérification du code produit.
-         */
-        if (product.getCode() == null|| product.getCode().trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Le code du produit est obligatoire."
-            );
+        if (requestDTO.getCode() == null || requestDTO.getCode().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le code du produit est obligatoire.");
         }
 
-        /*
-         * Vérification du nom du produit.
-         */
-        if (product.getName() == null| product.getName().trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Le nom du produit est obligatoire."
-            );
+        if (requestDTO.getName() == null || requestDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du produit est obligatoire.");
         }
 
-        /*
-         * Vérification de l'unicité du code.
-         */
-        if (productRepository.existsByCode(product.getCode())) {
-
-            throw new IllegalArgumentException(
-                    "Le code produit existe déjà : "
-                            + product.getCode()
-            );
+        if (productRepository.existsByCode(requestDTO.getCode())) {
+            throw new IllegalArgumentException("Le code produit existe déjà : " + requestDTO.getCode());
         }
 
-        /*
-         * Le code-barres est facultatif.
-         *
-         * On vérifie son unicité uniquement
-         * lorsqu'il est renseigné.
-         */
-        if (product.getBarcode() != null&& !product.getBarcode().trim().isEmpty()) {
-
-            if (productRepository.existsByBarcode(product.getBarcode())) {
-
-                throw new IllegalArgumentException(
-                        "Le code-barres existe déjà : "
-                                + product.getBarcode()
-                );
+        if (requestDTO.getBarcode() != null && !requestDTO.getBarcode().trim().isEmpty()) {
+            if (productRepository.existsByBarcode(requestDTO.getBarcode())) {
+                throw new IllegalArgumentException("Le code-barres existe déjà : " + requestDTO.getBarcode());
             }
         }
 
-        /*
-         * Si active n'est pas renseigné,
-         * le produit est actif par défaut.
-         *
-         * Cela correspond également à :
-         *
-         * private Boolean active = true;
-         *
-         * dans ton Entity Product.
-         */
+        // Récupération de la catégorie via son ID
+        Category category = null;
+        if (requestDTO.getCategoryId() != null) {
+            category = categoryRepository.findById(requestDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Catégorie introuvable avec l'id : " + requestDTO.getCategoryId()));
+        }
+
+        // Conversion du DTO vers l'entité via le mapper
+        Product product = ProductMapper.toEntity(requestDTO, category);
+
         if (product.getActive() == null) {
             product.setActive(true);
         }
 
-        /*
-         * Enregistrement dans PostgreSQL.
-         */
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return ProductMapper.toResponseDTO(savedProduct);
     }
 
     /**
-     * Modifie un produit existant.
-     *
-     * On récupère d'abord le produit existant
-     * puis on met à jour ses informations.
+     * Modifie un produit existant à partir d'un ProductRequestDTO.
      *
      * @param id ID du produit à modifier
-     * @param product données du nouveau produit
-     * @return produit modifié
+     * @param requestDTO données du nouveau produit
+     * @return produit modifié (DTO)
      */
-    public Product update(Long id, Product product) {
+    public ProductResponseDTO update(Long id, ProductRequestDTO requestDTO) {
 
-        /*
-         * Recherche du produit existant.
-         */
-        Product existingProduct = findById(id);
+        Product existingProduct = findEntityById(id);
 
-        /*
-         * Vérification du code.
-         */
-        if (product.getCode() == null|| product.getCode().trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Le code du produit est obligatoire."
-            );
+        if (requestDTO.getCode() == null || requestDTO.getCode().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le code du produit est obligatoire.");
         }
 
-        /*
-         * Vérification du nom.
-         */
-        if (product.getName() == null || product.getName().trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Le nom du produit est obligatoire."
-            );
+        if (requestDTO.getName() == null || requestDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du produit est obligatoire.");
         }
 
-        /*
-         * Si le code est modifié,
-         * nous devons vérifier qu'il n'est pas
-         * déjà utilisé par un autre produit.
-         */
-        if (!product.getCode().equals(existingProduct.getCode())
-                && productRepository.existsByCode(product.getCode())) {
-
-            throw new IllegalArgumentException(
-                    "Le code produit existe déjà : "
-                            + product.getCode()
-            );
+        if (!requestDTO.getCode().equals(existingProduct.getCode())
+                && productRepository.existsByCode(requestDTO.getCode())) {
+            throw new IllegalArgumentException("Le code produit existe déjà : " + requestDTO.getCode());
         }
 
-        /*
-         * Vérification du code-barres.
-         *
-         * Ici, pour rester simple et compatible
-         * avec ton Repository actuel, on vérifie
-         * uniquement lorsqu'il change.
-         */
-        if (product.getBarcode() != null
-                && !product.getBarcode().trim().isEmpty()
-                && !product.getBarcode().equals(existingProduct.getBarcode())
-                && productRepository.existsByBarcode(product.getBarcode())) {
-
-            throw new IllegalArgumentException(
-                    "Le code-barres existe déjà : "
-                            + product.getBarcode()
-            );
+        if (requestDTO.getBarcode() != null
+                && !requestDTO.getBarcode().trim().isEmpty()
+                && !requestDTO.getBarcode().equals(existingProduct.getBarcode())
+                && productRepository.existsByBarcode(requestDTO.getBarcode())) {
+            throw new IllegalArgumentException("Le code-barres existe déjà : " + requestDTO.getBarcode());
         }
 
-        /*
-         * Mise à jour des champs correspondant
-         * exactement à ton Product.java.
-         */
-        existingProduct.setCode(product.getCode());
-        existingProduct.setBarcode(product.getBarcode());
-        existingProduct.setName(product.getName());
-        existingProduct.setDescription(product.getDescription());
+        // Récupération de la catégorie si l'ID est fourni
+        Category category = existingProduct.getCategory();
+        if (requestDTO.getCategoryId() != null) {
+            category = categoryRepository.findById(requestDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Catégorie introuvable avec l'id : " + requestDTO.getCategoryId()));
+        }
 
-        existingProduct.setPurchasePrice(
-                product.getPurchasePrice()
-        );
+        existingProduct.setCode(requestDTO.getCode());
+        existingProduct.setBarcode(requestDTO.getBarcode());
+        existingProduct.setName(requestDTO.getName());
+        existingProduct.setDescription(requestDTO.getDescription());
+        existingProduct.setPurchasePrice(requestDTO.getPurchasePrice());
+        existingProduct.setSellingPrice(requestDTO.getSellingPrice());
+        existingProduct.setQuantity(requestDTO.getQuantity());
+        existingProduct.setMinimumStock(requestDTO.getMinimumStock());
+        existingProduct.setUnit(requestDTO.getUnit());
+        existingProduct.setActive(requestDTO.getActive() != null ? requestDTO.getActive() : existingProduct.getActive());
+        existingProduct.setCategory(category);
 
-        existingProduct.setSellingPrice(
-                product.getSellingPrice()
-        );
-
-        existingProduct.setQuantity(
-                product.getQuantity()
-        );
-
-        existingProduct.setMinimumStock(
-                product.getMinimumStock()
-        );
-
-        existingProduct.setUnit(
-                product.getUnit()
-        );
-
-        existingProduct.setActive(
-                product.getActive()
-        );
-
-        /*
-         * Mise à jour de la catégorie.
-         *
-         * La catégorie reçue doit correspondre
-         * à une Category existante.
-         *
-         * La validation de cette relation sera
-         * renforcée dans le Category/Product Service.
-         */
-        existingProduct.setCategory(
-                product.getCategory()
-        );
-
-        /*
-         * Sauvegarde du produit modifié.
-         */
-        return productRepository.save(existingProduct);
+        Product updatedProduct = productRepository.save(existingProduct);
+        return ProductMapper.toResponseDTO(updatedProduct);
     }
 
     /**
      * Supprime un produit.
      *
-     * ATTENTION :
-     * Cette méthode supprime réellement la ligne
-     * de la table product.
-     *
-     * Pour un système commercial, nous utiliserons
-     * probablement plus tard la désactivation
-     * avec active = false plutôt que la suppression.
-     *
      * @param id ID du produit
      */
     public void delete(Long id) {
-
-        /*
-         * Vérifie d'abord que le produit existe.
-         */
-        Product product = findById(id);
-
-        /*
-         * Suppression.
-         */
+        Product product = findEntityById(id);
         productRepository.delete(product);
     }
 
     /**
-     * Désactive un produit sans le supprimer
-     * de la base de données.
-     *
-     * C'est généralement préférable pour
-     * conserver l'historique des ventes.
+     * Désactive un produit.
      *
      * @param id ID du produit
-     * @return produit désactivé
+     * @return produit désactivé (DTO)
      */
-    public Product deactivate(Long id) {
-
-        Product product = findById(id);
-
+    public ProductResponseDTO deactivate(Long id) {
+        Product product = findEntityById(id);
         product.setActive(false);
-
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return ProductMapper.toResponseDTO(savedProduct);
     }
 
     /**
      * Réactive un produit.
      *
      * @param id ID du produit
-     * @return produit réactivé
+     * @return produit réactivé (DTO)
      */
-    public Product activate(Long id) {
-
-        Product product = findById(id);
-
+    public ProductResponseDTO activate(Long id) {
+        Product product = findEntityById(id);
         product.setActive(true);
-
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return ProductMapper.toResponseDTO(savedProduct);
     }
 
     /**
      * Vérifie si un produit est en stock faible.
      *
-     * Exemple :
-     *
-     * quantity = 5
-     * minimumStock = 10
-     *
-     * 5 <= 10
-     *
-     * Donc le produit est en stock faible.
-     *
      * @param product produit à vérifier
      * @return true si le stock est faible
      */
     public boolean isLowStock(Product product) {
-
-        /*
-         * Si quantity ou minimumStock n'est pas défini,
-         * nous ne pouvons pas déterminer le niveau du stock.
-         */
         if (product.getQuantity() == null
                 || product.getMinimumStock() == null) {
-
             return false;
         }
 

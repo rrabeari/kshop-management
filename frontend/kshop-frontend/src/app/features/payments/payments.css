@@ -1,0 +1,100 @@
+@import '../products/products.css';
+
+/* Dispositions spécifiques au Split-Form de paiement */
+.payment-split-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.payment-form-side {
+  border-right: 1px solid #e5e7eb;
+  padding-right: 20px;
+}
+
+.sales-selection-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.sales-selection-side h3 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #111827;
+}
+
+.sale-search {
+  margin-bottom: 12px;
+}
+
+.sales-list {
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 5px;
+}
+
+.sale-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.sale-item-card:hover {
+  border-color: #2563eb;
+  background: #f0f7ff;
+}
+
+.sale-item-card.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.sale-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sale-date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.sale-user {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.sale-amount {
+  font-weight: 700;
+  color: #16a34a;
+  font-size: 15px;
+}
+
+.selected-sale-input {
+  background-color: #f3f4f6 !important;
+  font-weight: 600;
+  color: #2563eb !important;
+}
+
+@media (max-width: 768px) {
+  .payment-split-container {
+    grid-template-columns: 1fr;
+  }
+  .payment-form-side {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 20px;
+  }
+}

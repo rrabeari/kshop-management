@@ -100,6 +100,23 @@ export const routes: Routes = [
         import('./features/stock/stock')
             .then(m => m.StockComponent)
     },
+    {
+        path: 'payments',
+        canActivate: [
+            authGuard,
+            roleGuard
+        ],
+        data: {
+            roles: [
+            'ADMIN',
+            'MANAGER',
+            'CASHIER'
+            ]
+        },
+        loadComponent: () =>
+            import('./features/payments/payments')
+            .then(m => m.Payments)
+    },
 
     {
         path: 'not-found',

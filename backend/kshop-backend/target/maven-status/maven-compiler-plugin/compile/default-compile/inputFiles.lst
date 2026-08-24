@@ -1,9 +1,9 @@
-C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\config\CorsConfig.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\config\DataInitializer.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\config\PasswordConfig.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\config\PasswordGenerator.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\AuthController.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\CategoryController.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\PaymentController.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\ProductController.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\SaleController.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\StockMovementController.java
@@ -11,11 +11,15 @@ C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\mai
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\controller\UserController.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\LoginRequest.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\LoginResponse.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\request\PaymentRequestDTO.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\request\ProductRequestDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\request\SaleItemRequestDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\request\SaleRequestDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\request\StockMovementRequestDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\ApiErrorResponse.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\CategoryResponseDTO.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\PaymentResponseDTO.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\PaymentStatisticsDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\ProductResponseDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\SaleItemResponseDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\SaleResponseDTO.java
@@ -23,6 +27,8 @@ C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\mai
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\dto\response\UserResponseDTO.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\BaseEntity.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\Category.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\enums\PaymentMethod.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\enums\PaymentStatus.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\Payment.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\Product.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\entity\Role.java
@@ -36,6 +42,7 @@ C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\mai
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\mapper\ProductMapper.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\mapper\StockMovementMapper.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\repository\CategoryRepository.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\repository\PaymentRepository.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\repository\ProductRepository.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\repository\RoleRepository.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\repository\SaleItemRepository.java
@@ -49,6 +56,8 @@ C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\mai
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\security\JwtService.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\security\SecurityConfig.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\CategoryService.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\PaymentService.java
+C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\PaymentStatisticsService.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\ProductService.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\SaleService.java
 C:\Users\Iris-PC\Documents\GitHub\kshop-management\backend\kshop-backend\src\main\java\com\kshop\backend\service\StockMovementService.java

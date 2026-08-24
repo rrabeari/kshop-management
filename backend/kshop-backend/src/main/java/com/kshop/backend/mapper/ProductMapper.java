@@ -4,6 +4,7 @@
  */
 package com.kshop.backend.mapper;
 
+import com.kshop.backend.dto.request.ProductRequestDTO;
 import com.kshop.backend.dto.response.CategoryResponseDTO;
 import com.kshop.backend.dto.response.ProductResponseDTO;
 import com.kshop.backend.entity.Category;
@@ -33,6 +34,34 @@ public class ProductMapper {
      * Il n'est donc pas nécessaire de créer une instance.
      */
     private ProductMapper() {
+    }
+
+    /**
+     * Convertit un ProductRequestDTO en entité Product.
+     * 
+     * @param dto ProductRequestDTO provenant du client
+     * @param category entité Category récupérée depuis la base de données via son ID
+     * @return entité Product initialisée
+     */
+    public static Product toEntity(ProductRequestDTO dto, Category category) {
+        if (dto == null) {
+            return null;
+        }
+
+        Product product = new Product();
+        product.setCode(dto.getCode());
+        product.setBarcode(dto.getBarcode());
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPurchasePrice(dto.getPurchasePrice());
+        product.setSellingPrice(dto.getSellingPrice());
+        product.setQuantity(dto.getQuantity());
+        product.setMinimumStock(dto.getMinimumStock());
+        product.setUnit(dto.getUnit());
+        product.setActive(dto.getActive() != null ? dto.getActive() : true);
+        product.setCategory(category);
+
+        return product;
     }
 
     /**

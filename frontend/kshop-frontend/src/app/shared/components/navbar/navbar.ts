@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 export class Navbar {
 
     private readonly authService = inject(AuthService);
+    private readonly router = inject(Router); // 1. Injection du Router
 
     /**
      * Username de l'utilisateur connecté.
@@ -37,7 +38,7 @@ export class Navbar {
     */
       logout(): void {
         this.authService.logout();
-        
+        this.router.navigate(['/login']); // 2. Redirection vers la page de login
       }
 
       /**

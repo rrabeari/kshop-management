@@ -1,391 +1,187 @@
 <div class="dashboard-page">
 
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
+  <!-- HEADER -->
   <div class="dashboard-header">
-
     <div>
       <h1>Dashboard</h1>
-
-      <p>
-        Vue générale de votre magasin
-      </p>
+      <p>Vue générale de votre magasin et performance des ventes</p>
     </div>
 
-    <button
-      type="button"
-      class="btn-refresh"
-      (click)="refresh()"
-      [disabled]="loading">
-
-      <span *ngIf="!loading">
-        ↻ Actualiser
-      </span>
-
-      <span *ngIf="loading">
-        Chargement...
-      </span>
-
+    <button type="button" class="btn-refresh" (click)="refresh()" [disabled]="loading">
+      <span *ngIf="!loading">↻ Actualiser</span>
+      <span *ngIf="loading">Chargement...</span>
     </button>
-
   </div>
 
-
-  <!-- =====================================================
-       ERROR
-       ===================================================== -->
-
-  <div
-    *ngIf="errorMessage"
-    class="error-message">
-
-    <span>
-      ⚠
-    </span>
-
-    {{ errorMessage }}
-
+  <!-- ERROR -->
+  <div *ngIf="errorMessage" class="error-message">
+    <span>⚠</span> {{ errorMessage }}
   </div>
 
-
-  <!-- =====================================================
-       LOADING
-       ===================================================== -->
-
-  <div
-    *ngIf="loading"
-    class="dashboard-loading">
-
+  <!-- LOADING -->
+  <div *ngIf="loading" class="dashboard-loading">
     <div class="loading-spinner"></div>
-
-    <p>
-      Chargement du Dashboard...
-    </p>
-
+    <p>Chargement du Dashboard...</p>
   </div>
 
-
-  <!-- =====================================================
-       DASHBOARD CONTENT
-       ===================================================== -->
-
+  <!-- DASHBOARD CONTENT -->
   <ng-container *ngIf="!loading && !errorMessage">
 
-    <!-- ===================================================
-         STATISTIQUES
-         =================================================== -->
-
+    <!-- RESUME STATISTIQUES (KPIs) -->
     <div class="dashboard-summary">
 
-      <!-- TOTAL VENTES -->
-
       <div class="summary-card">
-
-        <span class="summary-icon">
-          🧾
-        </span>
-
+        <span class="summary-icon">🧾</span>
         <div>
-
-          <span class="summary-label">
-            Total ventes
-          </span>
-
-          <strong>
-            {{ totalSales }}
-          </strong>
-
+          <span class="summary-label">Ventes (Terminées / Total)</span>
+          <strong>{{ completedSalesCount }} / {{ totalSales }}</strong>
         </div>
-
       </div>
 
-
-      <!-- CHIFFRE AFFAIRES -->
-
       <div class="summary-card">
-
-        <span class="summary-icon">
-          Ar
-        </span>
-
+        <span class="summary-icon">Ar</span>
         <div>
-
-          <span class="summary-label">
-            Chiffre d'affaires
-          </span>
-
-          <strong>
-            {{ completedSalesTotal | number:'1.2-2' }} Ar
-          </strong>
-
+          <span class="summary-label">Chiffre d'affaires</span>
+          <strong>{{ completedSalesTotal | number:'1.2-2' }} Ar</strong>
         </div>
-
       </div>
 
-
-      <!-- PRODUITS -->
-
       <div class="summary-card">
-
-        <span class="summary-icon">
-          📦
-        </span>
-
+        <span class="summary-icon">🛒</span>
         <div>
-
-          <span class="summary-label">
-            Produits
-          </span>
-
-          <strong>
-            {{ activeProductsCount }}
-          </strong>
-
+          <span class="summary-label">Panier Moyen</span>
+          <strong>{{ averageBasket | number:'1.2-2' }} Ar</strong>
         </div>
-
       </div>
 
-
-      <!-- STOCK FAIBLE -->
-
       <div class="summary-card">
-
-        <span class="summary-icon warning-icon">
-          ⚠
-        </span>
-
+        <span class="summary-icon warning-icon">⚠</span>
         <div>
-
-          <span class="summary-label">
-            Stock faible
-          </span>
-
-          <strong>
-            {{ lowStockCount }}
-          </strong>
-
+          <span class="summary-label">Alertes Stock</span>
+          <strong>{{ lowStockCount }}</strong>
         </div>
-
       </div>
 
     </div>
 
-
-    <!-- ===================================================
-         MAIN GRID
-         =================================================== -->
-
+    <!-- MAIN GRID (GRAPHIQUE + ARTICLES LES PLUS VENDUS) -->
     <div class="dashboard-grid">
 
-
-      <!-- =================================================
-           GRAPH
-           ================================================= -->
-
+      <!-- GRAPH -->
       <section class="dashboard-card sales-chart-card">
-
         <div class="card-header">
-
           <div>
-
-            <h2>
-              Évolution des ventes
-            </h2>
-
-            <p>
-              Chiffre d'affaires des ventes terminées
-            </p>
-
+            <h2>Évolution du chiffre d'affaires</h2>
+            <p>Historique des recettes sur les ventes terminées</p>
           </div>
-
         </div>
 
-
-        <div
-          *ngIf="sales.length > 0"
-          class="chart-container">
-
+        <div *ngIf="sales.length > 0" class="chart-container">
           <canvas #salesChart></canvas>
-
         </div>
 
-
-        <div
-          *ngIf="sales.length === 0"
-          class="card-empty">
-
-          <span>
-            📈
-          </span>
-
-          <p>
-            Aucune donnée de vente disponible.
-          </p>
-
+        <div *ngIf="sales.length === 0" class="card-empty">
+          <span>📈</span>
+          <p>Aucune donnée de vente disponible.</p>
         </div>
-
       </section>
 
-
-      <!-- =================================================
-           STOCK FAIBLE
-           ================================================= -->
-
+      <!-- TOP PRODUITS VENDUS -->
       <section class="dashboard-card">
-
         <div class="card-header">
-
           <div>
-
-            <h2>
-              Stock faible
-            </h2>
-
-            <p>
-              Produits nécessitant une attention
-            </p>
-
+            <h2>Top Ventes</h2>
+            <p>Produits les plus populaires</p>
           </div>
-
         </div>
-
 
         <div class="stock-list">
-
-          <div
-            *ngFor="let product of lowStockProducts"
-            class="stock-item">
-
+          <div *ngFor="let item of topSellingProducts" class="stock-item">
             <div>
-
-              <strong>
-                {{ product.name }}
-              </strong>
-
-              <small>
-                {{ product.code }}
-              </small>
-
+              <strong>{{ item.name }}</strong>
+              <small>{{ item.code }}</small>
             </div>
-
             <span class="stock-quantity">
-
-              {{ product.quantity }}
-              {{ product.unit }}
-
+              {{ item.quantity }} vendus ({{ item.totalRevenue | number:'1.0-0' }} Ar)
             </span>
-
           </div>
 
-
-          <div
-            *ngIf="lowStockProducts.length === 0"
-            class="card-empty small">
-
-            <span>
-              ✓
-            </span>
-
-            <p>
-              Aucun produit en stock faible.
-            </p>
-
+          <div *ngIf="topSellingProducts.length === 0" class="card-empty small">
+            <span>📦</span>
+            <p>Aucune donnée de produit vendu.</p>
           </div>
-
         </div>
-
       </section>
 
     </div>
 
+    <!-- SECONDARY GRID (DERNIÈRES VENTES + STOCK FAIBLE) -->
+    <div class="dashboard-grid secondary-grid">
 
-    <!-- =====================================================
-         DERNIÈRES VENTES
-         ===================================================== -->
-
-    <section class="dashboard-card recent-sales">
-
-      <div class="card-header">
-
-        <div>
-
-          <h2>
-            Dernières ventes
-          </h2>
-
-          <p>
-            Les dernières transactions enregistrées
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="recent-sales-list">
-
-        <div
-          *ngFor="let sale of recentSales"
-          class="recent-sale-item">
-
+      <!-- DERNIÈRES VENTES -->
+      <section class="dashboard-card recent-sales">
+        <div class="card-header">
           <div>
+            <h2>Dernières ventes</h2>
+            <p>Les dernières transactions enregistrées</p>
+          </div>
+        </div>
 
-            <strong>
-              Vente #{{ sale.id }}
-            </strong>
+        <div class="recent-sales-list">
+          <div *ngFor="let sale of recentSales" class="recent-sale-item">
+            <div>
+              <strong>Vente #{{ sale.id }}</strong>
+              <small>
+                {{ sale.username }} · {{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}
+              </small>
+            </div>
 
-            <small>
-              {{ sale.username }}
-              ·
-              {{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}
-            </small>
-
+            <div class="recent-sale-right">
+              <strong>{{ sale.totalAmount | number:'1.2-2' }} Ar</strong>
+              <span
+                class="status"
+                [class.completed]="sale.status === 'COMPLETED'"
+                [class.cancelled]="sale.status === 'CANCELLED'">
+                {{ sale.status }}
+              </span>
+            </div>
           </div>
 
+          <div *ngIf="recentSales.length === 0" class="card-empty">
+            <span>🧾</span>
+            <p>Aucune vente enregistrée.</p>
+          </div>
+        </div>
+      </section>
 
-          <div class="recent-sale-right">
+      <!-- STOCK FAIBLE -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <div>
+            <h2>Ruptures & Stock faible</h2>
+            <p>Produits nécessitant un réapprovisionnement</p>
+          </div>
+        </div>
 
-            <strong>
-              {{ sale.totalAmount | number:'1.2-2' }} Ar
-            </strong>
-
-            <span
-              class="status"
-              [class.completed]="
-                sale.status === 'COMPLETED'
-              "
-              [class.cancelled]="
-                sale.status === 'CANCELLED'
-              ">
-
-              {{ sale.status }}
-
+        <div class="stock-list">
+          <div *ngFor="let product of lowStockProducts" class="stock-item">
+            <div>
+              <strong>{{ product.name }}</strong>
+              <small>{{ product.code }}</small>
+            </div>
+            <span class="stock-quantity danger">
+              {{ product.quantity }} {{ product.unit }}
             </span>
-
           </div>
 
+          <div *ngIf="lowStockProducts.length === 0" class="card-empty small">
+            <span>✓</span>
+            <p>Aucun produit en stock faible.</p>
+          </div>
         </div>
+      </section>
 
-
-        <div
-          *ngIf="recentSales.length === 0"
-          class="card-empty">
-
-          <span>
-            🧾
-          </span>
-
-          <p>
-            Aucune vente enregistrée.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
+    </div>
 
   </ng-container>
 

@@ -74,6 +74,17 @@
 
     </a>
 
+    <!-- STOCK MOVEMENTS
+         ADMIN / STOCK -->
+    <a
+      *ngIf="hasRole('ADMIN', 'MANAGER', 'CAISSIER')"
+      routerLink="/payments"
+      routerLinkActive="active">
+
+      Payments
+
+    </a>
+
 
     <!-- USERS
          ADMIN uniquement -->

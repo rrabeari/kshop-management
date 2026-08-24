@@ -1,487 +1,263 @@
-<div class="products-page">
+<div class="categories-page">
 
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
-  <div class="products-header">
-
+  <!-- ================= HEADER ================= -->
+  <div class="categories-header">
     <div>
-
-      <h1>
-        Produits
-      </h1>
-
-      <p>
-        Gestion du catalogue et du stock
-      </p>
-
+      <h1>Gestion des Produits</h1>
+      <p>Consultez, ajoutez et gérez l'inventaire de vos produits</p>
     </div>
 
-
-    <button
-      type="button"
-      class="btn-refresh"
-      (click)="refresh()"
-      [disabled]="loading">
-
-      <span *ngIf="!loading">
-        ↻ Actualiser
-      </span>
-
-      <span *ngIf="loading">
-        Chargement...
-      </span>
-
-    </button>
-
+    <div class="header-actions">
+      <button class="btn-refresh" [disabled]="loading" (click)="refresh()">
+        Actualiser
+      </button>
+      <button class="btn-primary" (click)="openCreateForm()">
+        + Nouveau Produit
+      </button>
+    </div>
   </div>
 
-  <!-- =====================================================
-     STATISTIQUES
-     ===================================================== -->
-
-<div class="products-summary">
-
-  <!-- TOTAL -->
-
-  <div class="summary-card">
-
-    <span class="summary-icon">
-      📦
-    </span>
-
-    <div>
-
-      <span class="summary-label">
-        Total produits
-      </span>
-
-      <strong>
-        {{ totalProducts }}
-      </strong>
-
+  <!-- ================= CARTES STATISTIQUES ================= -->
+  <div class="stats-cards-container">
+    <div class="stat-card">
+      <div class="stat-icon total">📦</div>
+      <div class="stat-content">
+        <span class="stat-label">Total Produits</span>
+        <span class="stat-value">{{ totalProductsCount }}</span>
+      </div>
     </div>
 
-  </div>
-
-
-  <!-- ACTIFS -->
-
-  <div class="summary-card">
-
-    <span class="summary-icon">
-      ✓
-    </span>
-
-    <div>
-
-      <span class="summary-label">
-        Produits actifs
-      </span>
-
-      <strong>
-        {{ activeProductsCount }}
-      </strong>
-
+    <div class="stat-card">
+      <div class="stat-icon alert">⚠️</div>
+      <div class="stat-content">
+        <span class="stat-label">Rupture de stock</span>
+        <span class="stat-value">{{ outOfStockCount }}</span>
+      </div>
     </div>
 
-  </div>
-
-
-  <!-- STOCK FAIBLE -->
-
-  <div class="summary-card">
-
-    <span class="summary-icon">
-      ⚠
-    </span>
-
-    <div>
-
-      <span class="summary-label">
-        Stock faible
-      </span>
-
-      <strong>
-        {{ lowStockProductsCount }}
-      </strong>
-
+    <div class="stat-card">
+      <div class="stat-icon inactive">🔒</div>
+      <div class="stat-content">
+        <span class="stat-label">Produits désactivés</span>
+        <span class="stat-value">{{ inactiveProductsCount }}</span>
+      </div>
     </div>
 
-  </div>
-
-
-  <!-- INACTIFS -->
-
-  <div class="summary-card">
-
-    <span class="summary-icon">
-      ×
-    </span>
-
-    <div>
-
-      <span class="summary-label">
-        Produits inactifs
-      </span>
-
-      <strong>
-        {{ inactiveProductsCount }}
-      </strong>
-
+    <div class="stat-card">
+      <div class="stat-icon category">🏷️</div>
+      <div class="stat-content">
+        <span class="stat-label">Catégories concernées</span>
+        <span class="stat-value">{{ categoriesCount }}</span>
+      </div>
     </div>
-
   </div>
 
-</div>
-
-
-  <!-- =====================================================
-       LOADING
-       ===================================================== -->
-
-  <div
-    *ngIf="loading"
-    class="loading">
-
-    <div class="loading-spinner"></div>
-
-    <span>
-      Chargement des produits...
-    </span>
-
-  </div>
-
-
-  <!-- =====================================================
-       ERROR
-       ===================================================== -->
-
-  <div
-    *ngIf="errorMessage && !loading"
-    class="error-message">
-
-    <div class="error-icon">
-      ⚠
+  <!-- ================= MESSAGES ================= -->
+  @if (successMessage) {
+    <div class="success-message">
+      <span>{{ successMessage }}</span>
     </div>
+  }
 
-    <div>
-      <strong>
-        Impossible de charger les produits
-      </strong>
-
-      <p>
-        {{ errorMessage }}
-      </p>
+  @if (errorMessage && !formVisible) {
+    <div class="error-message">
+      <span>{{ errorMessage }}</span>
     </div>
-
-  </div>
-
-  <!-- =====================================================
-     FILTRES
-     ===================================================== -->
-
-<div class="products-filters">
-
-  <!-- RECHERCHE -->
-
-  <div class="search-box">
-
-    <label for="product-search">
-      Rechercher
-    </label>
-
-    <input
-      id="product-search"
-      type="text"
-      [(ngModel)]="searchTerm"
-      (ngModelChange)="onSearchChange()"
-      placeholder="Code, nom, code-barres, catégorie..."
-    />
-
-  </div>
-
-
-  <!-- STATUT -->
-
-  <div class="status-filter">
-
-    <label for="product-status">
-      Statut
-    </label>
-
-    <select
-      id="product-status"
-      [(ngModel)]="statusFilter"
-      (ngModelChange)="onStatusChange()">
-
-      <option value="ALL">
-        Tous
-      </option>
-
-      <option value="ACTIVE">
-        Actifs
-      </option>
-
-      <option value="INACTIVE">
-        Inactifs
-      </option>
-
-    </select>
-
-  </div>
-
-
-  <!-- RESET -->
-
-  <button
-    type="button"
-    class="btn-clear"
-    (click)="clearFilters()">
-
-    Réinitialiser
-
-  </button>
-
-</div>
-
-
-<!-- NOMBRE DE RÉSULTATS -->
-
-<div class="results-count">
-
-  {{ filteredProducts.length }}
-  produit(s) trouvé(s)
-
-</div>
-
-
-  <!-- =====================================================
-     TABLE PRODUITS
-     ===================================================== -->
-
-<div
-  *ngIf="
-    !loading &&
-    filteredProducts.length > 0
-  "
-  class="table-container">
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>ID</th>
-
-        <th>Produit</th>
-
-        <th>Catégorie</th>
-
-        <th>Prix achat</th>
-
-        <th>Prix vente</th>
-
-        <th>Stock</th>
-
-        <th>Unité</th>
-
-        <th>Statut</th>
-
-      </tr>
-
-    </thead>
-
-
-    <tbody>
-
-      <tr
-        *ngFor="let product of filteredProducts">
-
-        <!-- ID -->
-
-        <td class="product-id">
-
-          #{{ product.id }}
-
-        </td>
-
-
-        <!-- PRODUIT -->
-
-        <td class="product-info">
-
-          <strong>
-            {{ product.name }}
-          </strong>
-
-          <span>
-            {{ product.code }}
-          </span>
-
-          <small>
-            {{ product.barcode }}
-          </small>
-
-        </td>
-
-
-        <!-- CATÉGORIE -->
-
-        <td>
-
-          <span class="category-badge">
-
-            {{ product.category?.name || 'Sans catégorie' }}
-
-          </span>
-
-        </td>
-
-
-        <!-- PRIX ACHAT -->
-
-        <td class="price">
-
-          {{ product.purchasePrice | number:'1.2-2' }}
-
-          <span>
-            Ar
-          </span>
-
-        </td>
-
-
-        <!-- PRIX VENTE -->
-
-        <td class="selling-price">
-
-          {{ product.sellingPrice | number:'1.2-2' }}
-
-          <span>
-            Ar
-          </span>
-
-        </td>
-
-
-        <!-- STOCK -->
-
-        <td>
-
-          <div class="stock-info">
-
-            <strong>
-              {{ product.quantity }}
-            </strong>
-
-            <small>
-              minimum :
-              {{ product.minimumStock }}
-            </small>
-
-
-            <!-- RUPTURE -->
-
-            <span
-              *ngIf="isOutOfStock(product)"
-              class="stock-badge out-of-stock">
-
-              🔴 Rupture
-
-            </span>
-
-
-            <!-- STOCK FAIBLE -->
-
-            <span
-              *ngIf="
-                !isOutOfStock(product) &&
-                isLowStock(product)
-              "
-              class="stock-badge low-stock">
-
-              ⚠ Stock faible
-
-            </span>
-
+  }
+
+  <!-- ================= FORMULAIRE DE CRÉATION / MODIFICATION ================= -->
+  @if (formVisible) {
+    <div class="category-form-card">
+      <div class="form-header">
+        <div>
+          <h2>{{ editing ? 'Modifier le produit' : 'Créer un nouveau produit' }}</h2>
+          <p>Renseignez les informations de base et les tarifs du produit</p>
+        </div>
+        <button class="btn-close" [disabled]="saving" (click)="closeForm()">×</button>
+      </div>
+
+      @if (errorMessage) {
+        <div class="form-error">
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="saveProduct()">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label for="code">Code Produit *</label>
+            <input type="text" id="code" [(ngModel)]="productForm.code" name="code" required [disabled]="saving" placeholder="Ex: PRD-001" />
           </div>
+          <div class="form-group">
+            <label for="barcode">Code-barres</label>
+            <input type="text" id="barcode" [(ngModel)]="productForm.barcode" name="barcode" [disabled]="saving" placeholder="Ex: 376000000000" />
+          </div>
+        </div>
 
-        </td>
+        <div class="form-group">
+          <label for="name">Nom du Produit *</label>
+          <input type="text" id="name" [(ngModel)]="productForm.name" name="name" required [disabled]="saving" placeholder="Ex: Smartphone XYZ" />
+        </div>
 
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" [(ngModel)]="productForm.description" name="description" [disabled]="saving" placeholder="Description détaillée..."></textarea>
+        </div>
 
-        <!-- UNITÉ -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+          <div class="form-group">
+            <label for="purchasePrice">Prix d'achat *</label>
+            <input type="number" id="purchasePrice" [(ngModel)]="productForm.purchasePrice" name="purchasePrice" step="0.01" required [disabled]="saving" />
+          </div>
+          <div class="form-group">
+            <label for="sellingPrice">Prix de vente *</label>
+            <input type="number" id="sellingPrice" [(ngModel)]="productForm.sellingPrice" name="sellingPrice" step="0.01" required [disabled]="saving" />
+          </div>
+          <div class="form-group">
+            <label for="quantity">Quantité *</label>
+            <input type="number" id="quantity" [(ngModel)]="productForm.quantity" name="quantity" required [disabled]="saving" />
+          </div>
+          <div class="form-group">
+            <label for="minimumStock">Stock Min *</label>
+            <input type="number" id="minimumStock" [(ngModel)]="productForm.minimumStock" name="minimumStock" required [disabled]="saving" />
+          </div>
+        </div>
 
-        <td>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label for="unit">Unité</label>
+            <input type="text" id="unit" [(ngModel)]="productForm.unit" name="unit" [disabled]="saving" placeholder="Ex: pcs, kg, litre" />
+          </div>
+          
+          <div class="form-group">
+            <label for="categoryId">Catégorie *</label>
+            <select id="categoryId" [(ngModel)]="productForm.categoryId" name="categoryId" required [disabled]="saving">
+              <option [value]="0" disabled>Sélectionner une catégorie</option>
+              @for (cat of categories; track cat.id) {
+                <option [value]="cat.id">{{ cat.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
 
-          <span class="unit-badge">
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" [disabled]="saving" (click)="closeForm()">Annuler</button>
+          <button type="submit" class="btn-save" [disabled]="saving">
+            {{ saving ? 'Enregistrement...' : (editing ? 'Modifier' : 'Enregistrer') }}
+          </button>
+        </div>
 
-            {{ product.unit }}
+      </form>
+    </div>
+  }
 
-          </span>
-
-        </td>
-
-
-        <!-- STATUT -->
-
-        <td>
-
-          <span
-            class="status"
-            [class.active]="product.active"
-            [class.inactive]="!product.active">
-
-            {{ product.active ? 'ACTIF' : 'INACTIF' }}
-
-          </span>
-
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
-
-  <!-- =====================================================
-       EMPTY
-       ===================================================== -->
-
-  <div
-    *ngIf="
-      !loading &&
-      !errorMessage &&
-      filteredProducts.length === 0
-    "
-    class="empty">
-
-    <div class="empty-icon">
-      📦
+  <!-- ================= BARRE DE FILTRES JUSTE AU-DESSUS DU TABLEAU ================= -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="filterProducts()" 
+        placeholder="Rechercher par nom, code ou catégorie..." 
+        class="search-input"
+      />
     </div>
 
-    <strong>
-      Aucun produit trouvé
-    </strong>
+    <div class="status-filter-box">
+      <select [(ngModel)]="statusFilter" (change)="filterProducts()" class="filter-select">
+        <option value="all">Tous les statuts</option>
+        <option value="active">Actifs uniquement</option>
+        <option value="inactive">Inactifs uniquement</option>
+      </select>
+    </div>
 
-    <p>
-      Aucun produit ne correspond à votre recherche ou à vos filtres.
-    </p>
-
-    <button
-      type="button"
-      class="btn-clear"
-      (click)="clearFilters()">
-
-      Réinitialiser les filtres
-
+    <button class="btn-reset" (click)="resetFilters()" title="Réinitialiser les filtres">
+      Réinitialiser
     </button>
-
   </div>
+
+  <!-- ================= TABLEAU DES PRODUITS ================= -->
+  @if (loading && products.length === 0) {
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Chargement des produits...</p>
+    </div>
+  } @else if (products.length === 0) {
+    <div class="empty">
+      <div class="empty-icon">📦</div>
+      <strong>Aucun produit trouvé</strong>
+      <p>Commencez par ajouter votre premier produit en cliquant sur le bouton ci-dessus.</p>
+      <button class="btn-primary" (click)="openCreateForm()">+ Nouveau Produit</button>
+    </div>
+  } @else if (filteredProducts.length === 0) {
+    <div class="empty">
+      <div class="empty-icon">🔍</div>
+      <strong>Aucun résultat correspondant</strong>
+      <p>Aucun produit ne correspond à vos critères de recherche.</p>
+      <button class="btn-reset-empty" (click)="resetFilters()">Effacer les filtres</button>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>P. Vente</th>
+            <th>Stock Actuel</th>
+            <th>Stock Min.</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of filteredProducts; track product.id) {
+            <tr>
+              <td><strong>{{ product.code }}</strong></td>
+              <td>{{ product.name }}</td>
+              <td>
+                @if (product.category) {
+                  {{ product.category.name }}
+                } @else {
+                  <span class="text-muted">Aucune</span>
+                }
+              </td>
+              <td>{{ product.sellingPrice | number:'1.2-2' }} Ar</td>
+              <td>
+                <span [style.color]="product.quantity <= product.minimumStock ? '#dc2626' : 'inherit'" [style.font-weight]="product.quantity <= product.minimumStock ? '700' : 'normal'">
+                  {{ product.quantity }} {{ product.unit }}
+                </span>
+              </td>
+              <td>{{ product.minimumStock }} {{ product.unit }}</td>
+              <td>
+                <span [style.color]="product.active ? '#16a34a' : '#dc2626'" style="font-weight: 600;">
+                  {{ product.active ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  @if (product.active) {
+                    <button class="btn-action btn-deactivate" title="Désactiver le produit" (click)="toggleProductStatus(product)">
+                      🔒
+                    </button>
+                  } @else {
+                    <button class="btn-action btn-activate" title="Activer le produit" (click)="toggleProductStatus(product)">
+                      🔓
+                    </button>
+                  }
+
+                  <button class="btn-action btn-delete" title="Supprimer définitivement" (click)="deleteProduct(product)">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 
 </div>
